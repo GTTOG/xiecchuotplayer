@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Player</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Notification Container -->
+    <div id="notificationContainer" class="notification-container"></div>
+
+    <div id="authModal" class="modal active">
+        <div class="modal-content auth-container">
+            <div class="auth-header">
+                <h1>🎵 xiecchuot player</h1>
+                <p>Your Music, Your Space</p>
+            </div>
+
+            <div class="auth-tabs">
+                <button class="auth-tab-btn active" data-tab="login">Login</button>
+                <button class="auth-tab-btn" data-tab="register">Register</button>
+            </div>
+
+            <div id="loginTab" class="auth-tab-content active">
+                <form id="loginForm">
+                    <input type="text" id="loginUsername" placeholder="Username" required>
+                    <input type="password" id="loginPassword" placeholder="Password" required>
+                    <button type="submit" class="auth-btn">Login</button>
+                </form>
+                <p id="loginError" class="error-message"></p>
+            </div>
+
+            <div id="registerTab" class="auth-tab-content">
+                <form id="registerForm">
+                    <input type="text" id="registerUsername" placeholder="Username" required>
+                    <input type="email" id="registerEmail" placeholder="Email" required>
+                    <input type="password" id="registerPassword" placeholder="Password (min 6 chars)" required>
+                    <input type="password" id="registerConfirm" placeholder="Confirm Password" required>
+                    <button type="submit" class="auth-btn">Register</button>
+                </form>
+                <p id="registerError" class="error-message"></p>
+            </div>
+        </div>
+    </div>
+
+    <div id="appContainer" class="app-container hidden">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>🎵 xiecchuot player</h1>
+            </div>
+
+            <nav class="sidebar-nav">
+                <button class="nav-item active" data-view="home">
+                    <span class="nav-icon">🏠</span>
+                    <span>Home</span>
+                </button>
+                <button class="nav-item" data-view="playlist">
+                    <span class="nav-icon">📋</span>
+                    <span>My Playlist</span>
+                </button>
+                <button class="nav-item" data-view="liked">
+                    <span class="nav-icon">❤️</span>
+                    <span>Liked Songs</span>
+                </button>
+                <button class="nav-item" data-view="search">
+                    <span class="nav-icon">🔍</span>
+                    <span>Search</span>
+                </button>
+                <button class="nav-item" data-view="browse">
+                    <span class="nav-icon">🌐</span>
+                    <span>Browse</span>
+                </button>
+                <button class="nav-item" data-view="profile">
+                    <span class="nav-icon">👤</span>
+                    <span>Profile</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <span id="sidebarUsername" class="username">User</span>
+                    <button id="logoutSidebar" class="logout-mini">Logout</button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="app-header">
+                <div class="header-left">
+                    <button id="sidebarToggle" class="sidebar-toggle">☰</button>
+                    <h2 id="pageTitle">Home</h2>
+                </div>
+                <div class="header-right">
+                    <span id="headerUsername">User</span>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <section class="content-area">
+                <!-- Home View -->
+                <div id="homeView" class="view active">
+                    <div class="upload-card">
+                        <h3>Add Songs to Your Library</h3>
+                        <p>Upload MP3, MP4, WAV or OGG files</p>
+                        <div class="upload-zone">
+                            <input type="file" id="fileInput" accept=".mp3,.mp4,.wav,.ogg,.m4a,.flac" multiple>
+                            <label for="fileInput" class="upload-label">
+                                <span class="upload-icon">📤</span>
+                                <span>Click to upload or drag and drop</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="quick-stats">
+                        <div class="stat-card">
+                            <span class="stat-icon">🎵</span>
+                            <div class="stat-content">
+                                <p class="stat-label">Total Songs</p>
+                                <p class="stat-value" id="totalSongs">0</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-icon">⏰</span>
+                            <div class="stat-content">
+                                <p class="stat-label">Total Duration</p>
+                                <p class="stat-value" id="totalDuration">0h 0m</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="recent-section">
+                        <h3>Recently Added</h3>
+                        <div id="recentTracks" class="track-list"></div>
+                    </div>
+                </div>
+
+                <!-- Playlist View -->
+                <div id="playlistView" class="view">
+                    <div class="playlist-header">
+                        <h3>My Playlist</h3>
+                        <span class="track-count" id="playlistCount">0 tracks</span>
+                    </div>
+                    <div id="playlistTracks" class="track-list"></div>
+                </div>
+
+                <!-- Liked View -->
+                <div id="likedView" class="view">
+                    <div class="playlist-header">
+                        <h3>Liked Songs</h3>
+                        <span class="track-count" id="likedCount">0 tracks</span>
+                    </div>
+                    <div id="likedTracks" class="track-list"></div>
+                </div>
+
+                <!-- Search View -->
+                <div id="searchView" class="view">
+                    <div class="search-container">
+                        <input type="text" id="searchInput" placeholder="Search users, playlists...">
+                        <button id="searchBtn" class="search-btn">🔍 Search</button>
+                    </div>
+                    <div id="searchResults" class="search-results"></div>
+                </div>
+
+                <!-- Browse View -->
+                <div id="browseView" class="view">
+                    <div class="browse-header">
+                        <h3>Public Playlists</h3>
+                    </div>
+                    <div id="browseResults" class="playlists-grid"></div>
+                </div>
+
+                <!-- Profile View -->
+                <div id="profileView" class="view">
+                    <div class="profile-container">
+                        <div class="profile-card">
+                            <div class="profile-header">
+                                <span class="profile-avatar" id="profileAvatar">👤</span>
+                                <div class="profile-info">
+                                    <h2 id="profileDisplayName">User</h2>
+                                    <p id="profileUsername">@user</p>
+                                    <p id="profileBio">No bio yet</p>
+                                </div>
+                                <button id="editProfileBtn" class="btn-primary">Edit Profile</button>
+                            </div>
+
+                            <div class="profile-stats">
+                                <div class="stat-item">
+                                    <p class="stat-number" id="profileSongsCount">0</p>
+                                    <p class="stat-label">Songs</p>
+                                </div>
+                                <div class="stat-item">
+                                    <p class="stat-number" id="profileFollowersCount">0</p>
+                                    <p class="stat-label">Followers</p>
+                                </div>
+                                <div class="stat-item">
+                                    <p class="stat-number" id="profileFollowingCount">0</p>
+                                    <p class="stat-label">Following</p>
+                                </div>
+                            </div>
+
+                            <div class="profile-social">
+                                <h4>Social Media</h4>
+                                <div id="socialLinks" class="social-links"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Player -->
+        <footer class="player-footer">
+            <div class="player-container">
+                <!-- Current Track Info -->
+                <div class="track-display">
+                    <div class="track-album"></div>
+                    <div class="track-details">
+                        <p id="currentTrack" class="track-name">No track selected</p>
+                        <p class="track-artist">xiecchuot player</p>
+                    </div>
+                </div>
+
+                <!-- Player Controls -->
+                <div class="player-center">
+                    <div class="player-controls">
+                        <button id="prevBtn" class="control-btn" title="Previous">⏮</button>
+                        <button id="playBtn" class="control-btn play-toggle" title="Play">▶</button>
+                        <button id="nextBtn" class="control-btn" title="Next">⏭</button>
+                        <button id="loopBtn" class="control-btn loop-btn" title="Loop">🔁</button>
+                    </div>
+
+                    <div class="progress-bar">
+                        <span class="time" id="currentTime">0:00</span>
+                        <input type="range" id="progressBar" min="0" max="100" value="0">
+                        <span class="time" id="duration">0:00</span>
+                    </div>
+                </div>
+
+                <!-- Volume & Actions -->
+                <div class="player-right">
+                    <button id="likeBtn" class="control-btn like-btn" title="Like">🤍</button>
+                    <div class="volume-control">
+                        <span class="volume-icon">🔊</span>
+                        <input type="range" id="volumeSlider" min="0" max="100" value="70">
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Profile Edit Modal -->
+    <div id="profileModal" class="modal">
+        <div class="modal-content profile-edit-container">
+            <div class="modal-header">
+                <h2>Edit Profile</h2>
+                <button class="close-modal" id="closeProfileModal">✕</button>
+            </div>
+            <form id="profileForm">
+                <div class="form-group">
+                    <label for="editDisplayName">Display Name</label>
+                    <input type="text" id="editDisplayName" required>
+                </div>
+                <div class="form-group">
+                    <label for="editBio">Bio</label>
+                    <textarea id="editBio" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="editAvatar">Avatar Emoji</label>
+                    <input type="text" id="editAvatar" maxlength="2">
+                </div>
+                <div class="form-group">
+                    <label for="editTwitter">Twitter/X Handle</label>
+                    <input type="text" id="editTwitter" placeholder="@username">
+                </div>
+                <div class="form-group">
+                    <label for="editInstagram">Instagram Handle</label>
+                    <input type="text" id="editInstagram" placeholder="@username">
+                </div>
+                <div class="form-group">
+                    <label for="editYoutube">YouTube Channel</label>
+                    <input type="text" id="editYoutube" placeholder="Channel name">
+                </div>
+                <div class="form-group">
+                    <label for="editPassword">New Password (leave blank to keep current)</label>
+                    <input type="password" id="editPassword">
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Save Changes</button>
+                    <button type="button" class="btn-secondary" id="cancelProfileEdit">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Video Player Modal -->
+    <div id="videoModal" class="modal">
+        <div class="modal-content video-player-container">
+            <div class="video-header">
+                <h2 id="videoTitle">Video Player</h2>
+                <button class="close-modal" id="closeVideoModal">✕</button>
+            </div>
+            <div class="video-wrapper">
+                <video id="videoPlayer" controls width="100%">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Profile Modal -->
+    <div id="userProfileModal" class="modal">
+        <div class="modal-content user-profile-container">
+            <div class="modal-header">
+                <button class="close-modal" id="closeUserProfileModal">✕</button>
+            </div>
+            <div class="user-profile-card">
+                <div class="up-avatar" id="upAvatar">👤</div>
+                <h2 id="upDisplayName">User</h2>
+                <p id="upUsername">@user</p>
+                <p id="upBio">No bio</p>
+                <div class="up-stats">
+                    <div class="up-stat">
+                        <span class="up-stat-num" id="upSongsCount">0</span>
+                        <span>Songs</span>
+                    </div>
+                    <div class="up-stat">
+                        <span class="up-stat-num" id="upFollowersCount">0</span>
+                        <span>Followers</span>
+                    </div>
+                </div>
+                <div id="upSocialLinks" class="up-social-links"></div>
+                <button id="followBtn" class="btn-primary follow-btn">Follow</button>
+            </div>
+            <div class="user-playlists">
+                <h3>Public Playlists</h3>
+                <div id="userPublicPlaylists" class="playlists-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <audio id="audioPlayer"></audio>
+
+    <script src="device.js"></script>
+    <script src="storage.js"></script>
+    <script src="auth.js"></script>
+    <script src="player.js"></script>
+</body>
+</html>
